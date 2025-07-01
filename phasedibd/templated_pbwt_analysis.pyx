@@ -88,10 +88,10 @@ cdef class TPBWT:
         free(self.segments_end_cm)
         free(self.segments_start_bp)
         free(self.segments_end_bp)
-        cdef uint32_t num_cols
+        cdef uint32_t num_rows
         if self.current_matches_start != NULL:
-            num_cols = sizeof(self.current_matches_start)/sizeof(self.current_matches_start[0])
-            for i in xrange(num_cols):
+            num_rows = self.num_all_x_haplotypes
+            for i in xrange(num_rows):
                 free(self.current_matches_start[i])
                 free(self.current_matches_end[i])
             free(self.current_matches_start)
@@ -162,7 +162,7 @@ cdef class TPBWT:
 
         # first free any already allocated memory
         if self.current_matches_start != NULL:
-            num_rows = sizeof(self.current_matches_start)/sizeof(self.current_matches_start[0])
+            num_rows = self.num_all_x_haplotypes
             for i in xrange(num_rows):
                 free(self.current_matches_start[i])
                 free(self.current_matches_end[i])
