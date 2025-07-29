@@ -183,3 +183,43 @@ as long as they share the same set of SNPs.
 ## Other examples:
 
 See the test file for more examples on how to set up different types of analyses: `tests/unit_tests.py`
+
+## CLI Tool for Large Cohort Splitting
+
+For large cohorts that need to be split into smaller chunks for efficient processing, use the `tpbwt_cohort_split.py` CLI tool:
+
+```bash
+python scripts/tpbwt_cohort_split.py --vcf large_cohort.vcf --map genetic.map --out results/ --max-processors 16 --max-memory 10000
+```
+
+The tool automatically determines the optimal number of splits based on:
+- **Processor constraint**: `(N+1)(N)/2 ≤ P` where N is splits and P is processors
+- **Memory constraint**: `(S/N)² ≤ M` where S is samples, N is splits, and M is memory limit
+
+### CLI Options:
+
+| Option | Description |
+| --- | --- |
+| `--vcf` | Input phased VCF file (required) |
+| `--map` | Genetic map file (required) |
+| `--out` | Output directory prefix (required) |
+| `--num-splits` | Manual number of splits (overrides automatic calculation) |
+| `--max-processors` | Maximum processors available ('auto' or integer) |
+| `--max-memory` | Maximum memory per chunk in samples² (default: 10000) |
+| `--max-workers` | Maximum parallel workers (default: number of splits) |
+| `--verbose` | Enable verbose logging |
+
+### Examples:
+
+```bash
+# Auto-determine splits based on constraints
+python scripts/tpbwt_cohort_split.py --vcf data.vcf --map genetic.map --out results/ --max-processors 16 --max-memory 10000
+
+# Manually specify number of splits
+python scripts/tpbwt_cohort_split.py --vcf data.vcf --map genetic.map --out results/ --num-splits 4
+
+# Use all available CPU cores
+python scripts/tpbwt_cohort_split.py --vcf data.vcf --map genetic.map --out results/ --max-processors auto --max-memory 10000
+```
+
+The tool performs both in-sample and out-of-sample IBD analysis across all chunk combinations and outputs results to the specified directory.

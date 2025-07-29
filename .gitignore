@@ -18,3 +18,7 @@ venv
 .devcontainer
 
 .DS_Store
+
+# TPBWT compressed files
+*.tpbwt
+compressed_haplotypes_*

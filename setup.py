@@ -27,5 +27,11 @@ setup(
     include_package_data=True,
     url='https://github.com/23andme/' + name,
     ext_modules=cythonize([Extension('phasedibd.*', ['phasedibd/*.pyx'], include_dirs=[np.get_include()])]),
-    include_dirs=[np.get_include()]
+    include_dirs=[np.get_include()],
+    entry_points={
+        'console_scripts': [
+            'tpbwt-cohort-split=scripts.tpbwt_cohort_split:main',
+        ],
+    },
+    scripts=['scripts/tpbwt_cohort_split.py'],
 )
