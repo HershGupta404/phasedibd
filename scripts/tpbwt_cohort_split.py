@@ -51,9 +51,9 @@ def calculate_optimal_splits(num_samples, max_processors, max_memory):
     # N <= (-1 + sqrt(1 + 8P)) / 2
     max_splits_by_processors = int((-1 + sqrt(1 + 8 * max_processors)) / 2)
     
-    # Constraint 2: Memory limit - (2S/N)^2*8 <= memory in GB
-    # S^2/N^2 <= memory, so N >= 2*sqrt(8)*S/sqrt(memory)
-    min_splits_by_memory = ceil(num_samples * 2 * sqrt(8) / sqrt(max_memory / 1e9))
+    # Constraint 2: Memory limit - (2S/N)^2*16 <= memory in GB
+    # S^2/N^2 <= memory, so N >= 2*sqrt(16)*S/sqrt(memory)
+    min_splits_by_memory = ceil(num_samples * 2 * 4 / sqrt(max_memory / 1e9))
     
     # Check if constraints can be satisfied
     if min_splits_by_memory > max_splits_by_processors:
