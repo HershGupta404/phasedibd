@@ -31,7 +31,7 @@ def configure_logging(verbose=False):
     )
 
 
-def calculate_optimal_splits(num_samples, max_processors, max_memory_per_chunk):
+def calculate_optimal_splits(num_samples, max_processors, max_memory):
     """
     Calculate the optimal number of splits based on processor and memory constraints.
     
@@ -51,9 +51,9 @@ def calculate_optimal_splits(num_samples, max_processors, max_memory_per_chunk):
     # N <= (-1 + sqrt(1 + 8P)) / 2
     max_splits_by_processors = int((-1 + sqrt(1 + 8 * max_processors)) / 2)
     
-    # Constraint 2: Memory limit - (S/N)^2 <= memory
-    # S^2/N^2 <= memory, so N >= S/sqrt(memory)
-    min_splits_by_memory = ceil(num_samples / sqrt(max_memory_per_chunk))
+    # Constraint 2: Memory limit - (2S/N)^2*8 <= memory in GB
+    # S^2/N^2 <= memory, so N >= 2*sqrt(8)*S/sqrt(memory)
+    min_splits_by_memory = ceil(num_samples * 2 * sqrt(8) / sqrt(max_memory / 1e9))
     
     # Check if constraints can be satisfied
     if min_splits_by_memory > max_splits_by_processors:
@@ -75,7 +75,7 @@ def calculate_optimal_splits(num_samples, max_processors, max_memory_per_chunk):
     
     logging.info(f"Calculated optimal splits: {optimal_splits}")
     logging.info(f"  - Max splits by processors ({max_processors}): {max_splits_by_processors}")
-    logging.info(f"  - Min splits by memory ({max_memory_per_chunk}): {min_splits_by_memory}")
+    logging.info(f"  - Min splits by memory ({max_memory}): {min_splits_by_memory}")
     logging.info(f"  - Out-of-sample comparisons: {(optimal_splits + 1) * optimal_splits // 2}")
     logging.info(f"  - Samples per chunk: ~{ceil(num_samples / optimal_splits)}")
     
@@ -282,8 +282,8 @@ Examples:
     split_group.add_argument("--max-processors", type=str,
                            help="Maximum processors available ('auto' or integer)")
     
-    parser.add_argument("--max-memory", type=int, default=10000,
-                       help="Maximum memory per chunk in samples^2 (default: 10000)")
+    parser.add_argument("--max-memory", type=int, default=100,
+                       help="Maximum memory available in GB")
     
     # Processing options
     parser.add_argument("--max-workers", type=int, default=None,
